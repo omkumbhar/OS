@@ -19,11 +19,7 @@ typedef struct  Node
     struct  Node *node;
 } node;
 
-// very very important 
-typedef struct Hash {
-   int pid;   
-   int burst;
-} hashmap;
+// very very 
 
 
 
@@ -47,8 +43,8 @@ void appendNode(node *start,node *last,node *data);
 int main(){
     srand(time(0));
 
-    int proccess = 3;
-    //while( (proccess = RandomNum(10)) < 2  );
+    int proccess ;
+    while( (proccess = RandomNum(10)) >3  );
     int Priority[proccess];
     int Arrival_Time[proccess];
     int CPUBurst[proccess];
