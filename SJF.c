@@ -1,13 +1,16 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<time.h>
 #ifdef _WIN32
 #include <Windows.h>
 #define  Second Sleep(1000);
+#define  PER_SECOND CLOCKS_PER_SEC;
 #else
 #include <unistd.h>
 #define  Second sleep(1);
+#define  PER_SECOND (clock_t) 100;
 #endif
-#include<time.h>
+
 
 // Linked list
 typedef struct  Node
@@ -39,16 +42,16 @@ int RandomNum(int mod){
 node smallestNode(node *first,node *last);
 
 //Delete node in a linked list with given pid of process
-void deleteNode(node *first,int pid,node *last);
+int deleteNode(node *first,int pid,node *last);
 
 //To append node in linked list
-void appendNode(node *start,node *data);
+void Append(node *start,node *insert);
 
 int main(){
     srand(time(0));
 
-    int proccess = 4;
-    //while( (proccess = RandomNum(15)) <  );
+    int proccess = 10 ;
+   // while( (proccess = RandomNum(500)) < 400  );
     int Priority[proccess];
     int Arrival_Time[proccess];
     int CPUBurst[proccess];
@@ -67,7 +70,6 @@ int main(){
 
         for (int j = 0 ; j < CPUBurst[i];j++){
                 while( (Bursts[i][j] = RandomNum(10)) ==  0  );
-
         }
     }
 
@@ -83,6 +85,7 @@ int main(){
     //Ready Linked Lists
     node *head = (node* )  malloc( sizeof(node)  );
     node *firstReady = head;
+    firstReady ->node = NULL;
 
     //Running Linked list
     node *runningNode = (node* )  malloc( sizeof(node)  );
@@ -96,7 +99,9 @@ int main(){
 
     //Blocked Linked list
     node *headBlocked = (node* )  malloc( sizeof(node)  );
+
     node *firstBlocked = headBlocked;
+    //firstBlocked ->node = NULL;
 
     //Proccess ID
     int pos = 0; // proccess position
@@ -106,7 +111,7 @@ int main(){
     int proccessCompleted = 0;
 
     while(proccessCompleted < proccess  ){
-        time_spent = (double)(clock() - begin) / CLOCKS_PER_SEC;
+        time_spent = (double)(clock() - begin) / PER_SECOND;
 
         //LTS -------------
         //Add proccess to ready list
@@ -115,15 +120,25 @@ int main(){
                 second -> pid =  pos;
                 second ->burstPos = 1;
                 second -> burst = Bursts[pos][second ->burstPos];
-                
+                second ->node = NULL;
 
-                if(firstReady ->node == NULL ){
-                    head = firstReady;
-                }
+                if( firstReady ->node == NULL  ){
+           //printf("1\n");
+           firstReady ->node = second;
+       }
+       else{
+           //printf("2\n");
+           Append( firstReady ,second);
 
-                head ->node = second;
-                head = second;
-                head -> node = NULL;
+       }
+
+                // if(firstReady ->node == NULL ){
+                //     head = firstReady;
+                // }
+
+                // head ->node = second;
+                // head = second;
+                // head -> node = NULL;
                 pos++;
         }
         
@@ -170,7 +185,7 @@ int main(){
         //MTS 
         //---------------------------------------------
         /* See how much time process is running  */
-        time_running = (double)(clock() - startRunning) / CLOCKS_PER_SEC;
+        time_running = (double)(clock() - startRunning) / PER_SECOND;
 
         if( runningNode ->node != NULL &&   time_running >= runningNode ->node ->burst ){
             int pid = runningNode ->node ->pid;
@@ -193,15 +208,28 @@ int main(){
             nextBlocked ->burstPos = runningNode ->node ->burstPos;
             nextBlocked ->burst = runningNode ->node ->burst;
             nextBlocked ->blockedTime = 0; 
-            nextBlocked ->node = NULL; 
+            //nextBlocked ->node = NULL; 
 
-            if( firstBlocked ->node == NULL){
-                headBlocked = firstBlocked;    
-            }                    
+            // if( firstBlocked ->node == NULL){
+            //     headBlocked = firstBlocked;    
+            // }                    
 
-            headBlocked ->node = nextBlocked;
-            headBlocked = nextBlocked;
-            headBlocked ->node = NULL;
+            // headBlocked ->node = nextBlocked;
+            // headBlocked = nextBlocked;
+            // headBlocked ->node = NULL;
+
+            if(firstBlocked ->node != NULL  ){
+                Append(firstBlocked,nextBlocked);
+            }else
+            {
+                nextBlocked ->node = NULL;
+                firstBlocked ->node = nextBlocked;
+            }
+            
+
+
+            
+
 
             //Deleteing running Node
             deleteNode(runningNode,runningNode ->node ->pid,runningNode ->node);
@@ -247,21 +275,40 @@ int main(){
                     second ->burstPos = (n ->burstPos)+1;
                     //printf("new = %d\n",pid);
                     second -> burst = Bursts[pid][second ->burstPos];
-                
+                    second ->node = NULL;
+                    
 
-                    if(firstReady ->node == NULL ){
-                        head = firstReady;
+                    printf( "proccess complete blocked cycle  = %d  %d\n",pid+1,n ->blockedTime);
+
+
+
+                    //Append(firstReady,second);
+                    
+
+                    if( firstReady ->node == NULL  ){
+           
+                        firstReady ->node = second;
+                    }
+                    else{
+           
+                        Append( firstReady ,second);
+
                     }
 
-                    head ->node = second;
-                    head = second;
-                    head -> node = NULL;
+
+                    
+                    
+                    //free(second);
 
 
-                    printf( "proccess complete bocked cycle  = %d  %d\n",pid+1,n ->blockedTime);
+                    
                     //Deleting node from blocked linked list
                     deleteNode(firstBlocked,pid,headBlocked);
                     ///------------------
+
+
+                    
+
                     
                 }
 
@@ -316,13 +363,13 @@ node smallestNode(node *first,node *last){
 }
 
 //Delete process node in linked list
-void deleteNode(node *first,int pid,node *last){
+int deleteNode(node *first,int pid,node *last){
 
     node *next = first ->node;
     if(  next -> pid == pid ){
         first ->node = next ->node;
-        free(next);
-        return;
+        //free(next);
+        return 0;
     }
 
     node *lastNode = next; //save previous node
@@ -332,8 +379,8 @@ void deleteNode(node *first,int pid,node *last){
     while(next != NULL ){
         if(  next -> pid == pid ){
             lastNode ->node = next ->node;
-            free(next);
-            return;
+            //free(next);
+            return 0;
         }
         lastNode = next;
         next = next ->node;
@@ -342,37 +389,12 @@ void deleteNode(node *first,int pid,node *last){
 }
 
 //Append to linked list
-void appendNode(node *start,node *data){
-    node *new = (node *) malloc(sizeof(node) );
-    *new = *data;
-    //printf("\ndata of last %d \n",last ->pid );
-    new ->node = NULL;
-    
-    
-    node *n = start ->node;
-        while(n != NULL){
-            int pid = n -> pid;
-            printf( "Ready Proccess  = %d  %d\n",++pid,n ->burstPos);
-            n = n -> node;
-        }
-        n ->node = new;
-        free(data);
+void Append(node *start,node *insert)
+{
+    node  *new_node = (node *)malloc(sizeof( node));
+    *new_node = *insert;
+    new_node ->node = NULL;
 
-    /*last -> node = new;
-    
-    
-    
-    
-    //printf("\ndata of last %d \n",last ->pid );
-    //deleteNode(node *first,data,last);
-    free(data);
-    printf("\n  --------  proccesses in ready list --------------\n" );
+    node *ptr = start->node;
 
-
-    node *n = start ->node;
-        while(n != NULL){
-            int pid = n -> pid;
-            printf( "Ready Proccess  = %d  %d\n",++pid,n ->burstPos);
-            n = n -> node;
-        }*/
 }
