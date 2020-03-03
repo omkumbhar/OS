@@ -42,7 +42,7 @@ node smallestNode(node *first,node *last);
 void deleteNode(node *first,int pid,node *last);
 
 //To append node in linked list
-void appendNode(node *start,node *last,node *data);
+void appendNode(node *start,node *data);
 
 int main(){
     srand(time(0));
@@ -342,11 +342,27 @@ void deleteNode(node *first,int pid,node *last){
 }
 
 //Append to linked list
-void appendNode(node *start,node *last,node *data){
+void appendNode(node *start,node *data){
     node *new = (node *) malloc(sizeof(node) );
     *new = *data;
     //printf("\ndata of last %d \n",last ->pid );
-    last -> node = new;
+    new ->node = NULL;
+    
+    
+    node *n = start ->node;
+        while(n != NULL){
+            int pid = n -> pid;
+            printf( "Ready Proccess  = %d  %d\n",++pid,n ->burstPos);
+            n = n -> node;
+        }
+        n ->node = new;
+        free(data);
+
+    /*last -> node = new;
+    
+    
+    
+    
     //printf("\ndata of last %d \n",last ->pid );
     //deleteNode(node *first,data,last);
     free(data);
@@ -358,5 +374,5 @@ void appendNode(node *start,node *last,node *data){
             int pid = n -> pid;
             printf( "Ready Proccess  = %d  %d\n",++pid,n ->burstPos);
             n = n -> node;
-        }
+        }*/
 }
