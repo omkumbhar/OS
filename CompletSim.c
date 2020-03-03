@@ -50,8 +50,8 @@ void Append(node *start,node *insert);
 int main(){
     srand(time(0));
 
-    int proccess = 4;
-    //while( (proccess = RandomNum(15)) <  );
+    int proccess = 10 ;
+   // while( (proccess = RandomNum(10)) < 10 );
     int Priority[proccess];
     int Arrival_Time[proccess];
     int CPUBurst[proccess];
@@ -85,6 +85,7 @@ int main(){
     //Ready Linked Lists
     node *head = (node* )  malloc( sizeof(node)  );
     node *firstReady = head;
+    firstReady ->node = NULL;
 
     //Running Linked list
     node *runningNode = (node* )  malloc( sizeof(node)  );
@@ -119,15 +120,25 @@ int main(){
                 second -> pid =  pos;
                 second ->burstPos = 1;
                 second -> burst = Bursts[pos][second ->burstPos];
-                
+                second ->node = NULL;
 
-                if(firstReady ->node == NULL ){
-                    head = firstReady;
-                }
+                if( firstReady ->node == NULL  ){
+           //printf("1\n");
+           firstReady ->node = second;
+       }
+       else{
+           //printf("2\n");
+           Append( firstReady ,second);
 
-                head ->node = second;
-                head = second;
-                head -> node = NULL;
+       }
+
+                // if(firstReady ->node == NULL ){
+                //     head = firstReady;
+                // }
+
+                // head ->node = second;
+                // head = second;
+                // head -> node = NULL;
                 pos++;
         }
         
@@ -264,25 +275,40 @@ int main(){
                     second ->burstPos = (n ->burstPos)+1;
                     //printf("new = %d\n",pid);
                     second -> burst = Bursts[pid][second ->burstPos];
-                
+                    second ->node = NULL;
                     
-                    Append(firstBlocked,second);
+
+                    printf( "proccess complete blocked cycle  = %d  %d\n",pid+1,n ->blockedTime);
+
+
+
+                    //Append(firstReady,second);
                     
-                    //if(firstReady ->node == NULL ){
-                    //    head = firstReady;
-                   // }
+
+                    if( firstReady ->node == NULL  ){
+           
+                        firstReady ->node = second;
+                    }
+                    else{
+           
+                        Append( firstReady ,second);
+
+                    }
 
 
+                    
+                    
+                    //free(second);
 
-                    //head ->node = second;
-                    //head = second;
-                    //head -> node = NULL;
 
-
-                    printf( "proccess complete bocked cycle  = %d  %d\n",pid+1,n ->blockedTime);
+                    
                     //Deleting node from blocked linked list
                     deleteNode(firstBlocked,pid,headBlocked);
                     ///------------------
+
+
+                    
+
                     
                 }
 
@@ -368,10 +394,11 @@ void Append(node *start,node *insert)
     node  *new_node = (node *)malloc(sizeof( node));
     *new_node = *insert;
     new_node ->node = NULL;
+
     node *ptr = start->node;
 
     while(ptr -> node != NULL){ 
-        printf("inside append cuu node =   %d \n", ptr ->pid);
+        //printf("inside append cuu node =   %d \n", ptr ->pid);
     ptr = ptr -> node;
 }
     ptr -> node = new_node;
