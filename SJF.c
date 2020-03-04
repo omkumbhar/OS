@@ -1,3 +1,6 @@
+
+#include "linkedList.c"
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
@@ -11,24 +14,6 @@
 #define  PER_SECOND (clock_t) 100;
 #endif
 
-//latest commit hdhbhd
-// Linked list
-typedef struct  Node
-{
-    int pid ;
-    int blockedTime;
-    int burstPos ;
-    int burst ;
-    struct  Node *node;
-} node;
-
-// very very important 
-typedef struct Hash {
-   int pid;   
-   int burst;
-} hashmap;
-
-
 
 //Print created proccesss
 void PrintProccess ( int proccess,int Priority[],int Arrival_Time[],int CPUBurst[],  int Bursts[][11]); 
@@ -38,19 +23,10 @@ int RandomNum(int mod){
     return (rand() % mod) ;
 }
 
-//Find smallest node in linked list
-node smallestNode(node *first,node *last);
-
-//Delete node in a linked list with given pid of process
-int deleteNode(node *first,int pid,node *last);
-
-//To append node in linked list
-void Append(node *start,node *insert);
-
 int main(){
     srand(time(0));
 
-    int proccess = 10 ;
+    int proccess = 5 ;
    // while( (proccess = RandomNum(500)) < 400  );
     int Priority[proccess];
     int Arrival_Time[proccess];
@@ -123,14 +99,14 @@ int main(){
                 second ->node = NULL;
 
                 if( firstReady ->node == NULL  ){
-           //printf("1\n");
-           firstReady ->node = second;
-       }
-       else{
-           //printf("2\n");
-           Append( firstReady ,second);
+                    //printf("1\n");
+                    firstReady ->node = second;
+                }
+                else{
+                    //printf("2\n");
+                    Append( firstReady ,second);
 
-       }
+                }
 
                 // if(firstReady ->node == NULL ){
                 //     head = firstReady;
@@ -146,7 +122,7 @@ int main(){
         node *n = firstReady ->node;
         while(n != NULL){
             int pid = n -> pid;
-            printf( "Ready Proccess  = %d  %d\n",pid+1,n ->burst);
+            printf( "Ready Proccess  = P%d  %d\n",pid+1,n ->burst);
             n = n -> node;
         }
 
@@ -167,7 +143,7 @@ int main(){
 
 
 
-            /* Mark beginning time */
+            /* Mark beginning time of running proccess */
             startRunning = clock();
 
 
@@ -177,7 +153,7 @@ int main(){
         
         if( runningNode ->node != NULL  ){
             int pid = runningNode ->node ->pid;
-            printf(" Running Process is %d  \n", pid+1);
+            printf(" Running Process is P%d  \n", pid+1);
         }
         //---------------------------------------
         //STS end
@@ -242,7 +218,7 @@ int main(){
             while(n != NULL){
                 int pid = n -> pid;
                 n ->blockedTime =  ++(n -> blockedTime);
-                printf( "Blocked Proccess  = %d  %d\n",pid+1,n ->blockedTime);
+                printf( "Blocked Proccess  = P%d  %d\n",pid+1,n ->blockedTime);
                 n = n -> node;
             }
         }
@@ -254,7 +230,7 @@ int main(){
                 int pid = n -> pid;
                 
                 if(n ->blockedTime >= n->burst && n ->burstPos >= (  CPUBurst[pid] -1  ) ){
-                    printf( "proccess execution  has been completed  = %d  %d\n",pid+1,n ->blockedTime);
+                    printf( "proccess execution  has been completed  = P%d  %d\n",pid+1,n ->blockedTime);
                     //Deleting node from blocked linked list
                     deleteNode(firstBlocked,pid,headBlocked);
                     n = n -> node;
@@ -278,7 +254,7 @@ int main(){
                     second ->node = NULL;
                     
 
-                    printf( "proccess complete blocked cycle  = %d  %d\n",pid+1,n ->blockedTime);
+                    printf( "proccess complete blocked cycle  = P%d  %d\n",pid+1,n ->blockedTime);
 
 
 
@@ -298,7 +274,7 @@ int main(){
 
                     
                     
-                    //free(second);
+                
 
 
                     
@@ -343,58 +319,4 @@ void PrintProccess ( int proccess,int Priority[],int Arrival_Time[],int CPUBurst
         }
         printf("\n");
     }
-}
-
-//Find node with smallest burst size
-node smallestNode(node *first,node *last){
-
-    node *min = first ->node;
-    node *n = min ->node;;
-    
-    while( n != NULL  ){
-        if( n ->burst < min ->burst  )
-            min = n;
-        n = n ->node;
-    }
-    node smallest = *min;
-    deleteNode(first,min -> pid,last);
-    return smallest;
-
-}
-
-//Delete process node in linked list
-int deleteNode(node *first,int pid,node *last){
-
-    node *next = first ->node;
-    if(  next -> pid == pid ){
-        first ->node = next ->node;
-        //free(next);
-        return 0;
-    }
-
-    node *lastNode = next; //save previous node
-
-    next = next ->node; // next node
-
-    while(next != NULL ){
-        if(  next -> pid == pid ){
-            lastNode ->node = next ->node;
-            //free(next);
-            return 0;
-        }
-        lastNode = next;
-        next = next ->node;
-
-    }
-}
-
-//Append to linked list
-void Append(node *start,node *insert)
-{
-    node  *new_node = (node *)malloc(sizeof( node));
-    *new_node = *insert;
-    new_node ->node = NULL;
-
-    node *ptr = start->node;
-
 }
