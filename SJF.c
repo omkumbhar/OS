@@ -134,10 +134,7 @@ int main(){
 
             /* Mark beginning time of running proccess */
             startRunning = clock();
-
-
-
-
+            
         }
         
         if( runningNode ->node != NULL  ){
