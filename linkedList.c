@@ -14,8 +14,11 @@
 //Find smallest node in linked list
 node smallestNode(node *first,node *last);
 
-//Find node / process with highest priority1
+//Find node / process with highest priority
 node highPriorityNode(node *first,node *last);
+
+//Delete first process and delete it from ready list specialy for the FIFO
+node fifo(node *first,node *last);
 
 //Delete node in a linked list with given pid of process
 int deleteNode(node *first,int pid,node *last);
@@ -56,6 +59,25 @@ node highPriorityNode(node *first,node *last){
     deleteNode(first,big -> pid,last);
     return biggestPriorityNode;
 }
+
+//Delete first process and delete it from ready list specialy for the FIFO
+node fifo(node *first,node *last){
+
+    node *firstProcess = first ->node;
+    node *n = firstProcess ->node;
+    
+    // while( n != NULL  ){
+    //     if( n ->priority > firstProcess ->priority  )
+    //         firstProcess = n;
+    //     n = n ->node;
+    // }
+    node firstNode = *firstProcess;
+    deleteNode(first,firstProcess -> pid,last);
+    return firstNode;
+
+
+}
+
 
 
 //Delete process node in linked list
