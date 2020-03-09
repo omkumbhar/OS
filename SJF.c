@@ -35,6 +35,9 @@ int main(){
     int ArrTime  = 0 ;
     for(int i = 0;i < proccess;i++){
         Priority[i] = RandomNum(10);
+        while( Priority[i] == 0 ) {
+            Priority[i] = RandomNum(10);
+        }
         Arrival_Time[i] = ArrTime;
         ArrTime  += RandomNum(10);
         CPUBurst[i] = RandomNum(10);
@@ -42,8 +45,6 @@ int main(){
             CPUBurst[i] = RandomNum(10);
         }
         if( CPUBurst[i] % 2 == 0) CPUBurst[i] +=1; 
-
-
         for (int j = 0 ; j < CPUBurst[i];j++){
                 while( (Bursts[i][j] = RandomNum(10)) ==  0  );
         }
@@ -77,7 +78,6 @@ int main(){
     node *headBlocked = (node* )  malloc( sizeof(node)  );
 
     node *firstBlocked = headBlocked;
-    //firstBlocked ->node = NULL;
 
     //Proccess ID
     int pos = 0; // proccess position
@@ -99,13 +99,10 @@ int main(){
                 second ->node = NULL;
 
                 if( firstReady ->node == NULL  ){
-                    //printf("1\n");
                     firstReady ->node = second;
                 }
                 else{
-                    //printf("2\n");
                     Append( firstReady ,second);
-
                 }
                 pos++;
         }

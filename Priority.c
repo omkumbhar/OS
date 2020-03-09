@@ -26,7 +26,7 @@ int RandomNum(int mod){
 int main(){
     srand(time(0));
 
-    int proccess = 10 ;
+    int proccess = 5 ;
    // while( (proccess = RandomNum(500)) < 400  );
     int Priority[proccess];
     int Arrival_Time[proccess];
@@ -34,7 +34,14 @@ int main(){
     int Bursts[proccess][11];
     int ArrTime  = 0 ;
     for(int i = 0;i < proccess;i++){
+
         Priority[i] = RandomNum(10);
+
+        while( Priority[i] == 0 ) {
+            Priority[i] = RandomNum(10);
+        }
+
+
         Arrival_Time[i] = ArrTime;
         ArrTime  += RandomNum(10);
         CPUBurst[i] = RandomNum(10);
@@ -94,27 +101,17 @@ int main(){
         if(pos <  proccess && time_spent  >=  Arrival_Time[pos]  ) {
               node *second = (node *) malloc(sizeof(node) );
                 second -> pid =  pos;
+                second ->priority = Priority[pos];
                 second ->burstPos = 1;
                 second -> burst = Bursts[pos][second ->burstPos];
                 second ->node = NULL;
 
-                if( firstReady ->node == NULL  ){
-                    //printf("1\n");
+                if( firstReady ->node == NULL  ){                    
                     firstReady ->node = second;
                 }
-                else{
-                    //printf("2\n");
+                else{                    
                     Append( firstReady ,second);
-
                 }
-
-                // if(firstReady ->node == NULL ){
-                //     head = firstReady;
-                // }
-
-                // head ->node = second;
-                // head = second;
-                // head -> node = NULL;
                 pos++;
         }
         
@@ -122,7 +119,7 @@ int main(){
         node *n = firstReady ->node;
         while(n != NULL){
             int pid = n -> pid;
-            printf( "Ready Proccess  = P%d  %d\n",pid+1,n ->burst);
+            printf( "Ready Proccess  = P%d  %d\n",pid+1,n ->priority);
             n = n -> node;
         }
 
@@ -132,12 +129,14 @@ int main(){
         //---------------------------------------
         printf ("-------------------------------------------------------------------------------\n");
         if (firstReady ->node != NULL && runningNode ->node == NULL ){
-            running = smallestNode(firstReady,head);
+            running = highPriorityNode(firstReady,head);
+
             int pid = running. pid;
             node *runningN = (node *) malloc(sizeof(node) );
 
             runningN  = &running;
             runningN ->node = NULL;
+
             runningNode ->node = runningN;
 
 
@@ -153,7 +152,7 @@ int main(){
         
         if( runningNode ->node != NULL  ){
             int pid = runningNode ->node ->pid;
-            printf(" Running Process is P%d  \n", pid+1);
+            printf(" Running Process is P%d   %d \n", pid+1, runningNode ->node ->priority );
         }
         //---------------------------------------
         //STS end
@@ -165,7 +164,7 @@ int main(){
 
         if( runningNode ->node != NULL &&   time_running >= runningNode ->node ->burst ){
             int pid = runningNode ->node ->pid;
-            printf("Proccess %d has completed cup cycle \n",pid +1 );
+            printf("Proccess %d has completed CPU cycle \n",pid +1 );
 
             
             
@@ -177,23 +176,18 @@ int main(){
 
             
 
-            //Adding node for blocked list
+            
+            //Creating temp node address to add to blocked list
             node *nextBlocked = (node *) malloc(sizeof(node) );
 
             nextBlocked ->pid = runningNode ->node ->pid;
+            nextBlocked ->priority = runningNode ->node ->priority;
             nextBlocked ->burstPos = runningNode ->node ->burstPos;
             nextBlocked ->burst = runningNode ->node ->burst;
             nextBlocked ->blockedTime = 0; 
-            //nextBlocked ->node = NULL; 
+            
 
-            // if( firstBlocked ->node == NULL){
-            //     headBlocked = firstBlocked;    
-            // }                    
-
-            // headBlocked ->node = nextBlocked;
-            // headBlocked = nextBlocked;
-            // headBlocked ->node = NULL;
-
+            //Adding temp node for blocked list
             if(firstBlocked ->node != NULL  ){
                 Append(firstBlocked,nextBlocked);
             }else
@@ -202,14 +196,9 @@ int main(){
                 firstBlocked ->node = nextBlocked;
             }
             
-
-
-            
-
-
             //Deleteing running Node
             deleteNode(runningNode,runningNode ->node ->pid,runningNode ->node);
-            //runningNode ->node = NULL;
+            
         }
         
         printf ("-------------------------------------------------------------------------------\n");
@@ -226,7 +215,7 @@ int main(){
         if(firstBlocked ->node != NULL){
             node *n = firstBlocked ->node;
             while(n != NULL){
-                //printf("old = %d\n",n ->pid);
+                
                 int pid = n -> pid;
                 
                 if(n ->blockedTime >= n->burst && n ->burstPos >= (  CPUBurst[pid] -1  ) ){
@@ -239,17 +228,13 @@ int main(){
                     continue;
                 }
 
-
-
-
                 //If burst is complete add it to ready linked list with next burst
                 if( n ->blockedTime >= n->burst  ){
                     ///------------------
                     node *second = (node *) malloc(sizeof(node) );
                     second -> pid =  pid;
-                    
                     second ->burstPos = (n ->burstPos)+1;
-                    //printf("new = %d\n",pid);
+                    second ->priority = n ->priority;
                     second -> burst = Bursts[pid][second ->burstPos];
                     second ->node = NULL;
                     
@@ -258,7 +243,7 @@ int main(){
 
 
 
-                    //Append(firstReady,second);
+                    
                     
 
                     if( firstReady ->node == NULL  ){

@@ -2,6 +2,7 @@
  typedef struct  Node
 {
     int pid ;
+    int priority;
     int blockedTime;
     int burstPos ;
     int burst ;
@@ -9,14 +10,12 @@
 } node;
 
 
-// extern void print(){
-//     printf("Hello World");
-
-// }
-
 
 //Find smallest node in linked list
 node smallestNode(node *first,node *last);
+
+//Find node / process with highest priority1
+node highPriorityNode(node *first,node *last);
 
 //Delete node in a linked list with given pid of process
 int deleteNode(node *first,int pid,node *last);
@@ -29,7 +28,7 @@ void Append(node *start,node *insert);
 node smallestNode(node *first,node *last){
 
     node *min = first ->node;
-    node *n = min ->node;;
+    node *n = min ->node;
     
     while( n != NULL  ){
         if( n ->burst < min ->burst  )
@@ -41,6 +40,23 @@ node smallestNode(node *first,node *last){
     return smallest;
 
 }
+
+
+//Find node / process with highest priority
+node highPriorityNode(node *first,node *last){
+    node *big = first ->node;
+    node *n = big ->node;
+    
+    while( n != NULL  ){
+        if( n ->priority > big ->priority  )
+            big = n;
+        n = n ->node;
+    }
+    node biggestPriorityNode = *big;
+    deleteNode(first,big -> pid,last);
+    return biggestPriorityNode;
+}
+
 
 //Delete process node in linked list
 int deleteNode(node *first,int pid,node *last){
