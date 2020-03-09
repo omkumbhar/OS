@@ -107,14 +107,6 @@ int main(){
                     Append( firstReady ,second);
 
                 }
-
-                // if(firstReady ->node == NULL ){
-                //     head = firstReady;
-                // }
-
-                // head ->node = second;
-                // head = second;
-                // head -> node = NULL;
                 pos++;
         }
         
@@ -165,7 +157,7 @@ int main(){
 
         if( runningNode ->node != NULL &&   time_running >= runningNode ->node ->burst ){
             int pid = runningNode ->node ->pid;
-            printf("Proccess %d has completed cup cycle \n",pid +1 );
+            printf("Proccess %d has completed CPU cycle \n",pid +1 );
 
             
             
@@ -184,15 +176,7 @@ int main(){
             nextBlocked ->burstPos = runningNode ->node ->burstPos;
             nextBlocked ->burst = runningNode ->node ->burst;
             nextBlocked ->blockedTime = 0; 
-            //nextBlocked ->node = NULL; 
-
-            // if( firstBlocked ->node == NULL){
-            //     headBlocked = firstBlocked;    
-            // }                    
-
-            // headBlocked ->node = nextBlocked;
-            // headBlocked = nextBlocked;
-            // headBlocked ->node = NULL;
+            
 
             if(firstBlocked ->node != NULL  ){
                 Append(firstBlocked,nextBlocked);
@@ -226,7 +210,7 @@ int main(){
         if(firstBlocked ->node != NULL){
             node *n = firstBlocked ->node;
             while(n != NULL){
-                //printf("old = %d\n",n ->pid);
+                
                 int pid = n -> pid;
                 
                 if(n ->blockedTime >= n->burst && n ->burstPos >= (  CPUBurst[pid] -1  ) ){
@@ -249,7 +233,7 @@ int main(){
                     second -> pid =  pid;
                     
                     second ->burstPos = (n ->burstPos)+1;
-                    //printf("new = %d\n",pid);
+                    
                     second -> burst = Bursts[pid][second ->burstPos];
                     second ->node = NULL;
                     
@@ -258,7 +242,7 @@ int main(){
 
 
 
-                    //Append(firstReady,second);
+                    
                     
 
                     if( firstReady ->node == NULL  ){
