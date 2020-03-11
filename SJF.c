@@ -30,7 +30,7 @@ int main(){
     srand(time(0));
 
     int proccess = 1;
-   // while( (proccess = RandomNum(500)) < 400  );
+    while( (proccess = RandomNum(15)) < 5  );
     int Priority[proccess];
     int Arrival_Time[proccess];
     int CPUBurst[proccess];
