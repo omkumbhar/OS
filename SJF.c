@@ -15,8 +15,11 @@
 #endif
 
 
-//Print created proccesss
+//Print created proccess
 void PrintProccess ( int proccess,int Priority[],int Arrival_Time[],int CPUBurst[],  int Bursts[][11]); 
+
+//Print statitics of process
+void PrintProcessStat(int proccess,int TurnAroundTime[],int TotalBurstTime[] );
 
 //get random numbers within range  mod
 int RandomNum(int mod){
@@ -26,12 +29,21 @@ int RandomNum(int mod){
 int main(){
     srand(time(0));
 
-    int proccess = 5 ;
+    int proccess = 1;
    // while( (proccess = RandomNum(500)) < 400  );
     int Priority[proccess];
     int Arrival_Time[proccess];
     int CPUBurst[proccess];
     int Bursts[proccess][11];
+
+    
+    int TotalBurstTime[  proccess  ]; // To store total burst time
+    memset( TotalBurstTime, 0, proccess *sizeof(int) ); // initialize array with zero at all index
+
+    int TurnAroundTime[proccess]; // To stote turn arround time 
+
+
+
     int ArrTime  = 0 ;
     for(int i = 0;i < proccess;i++){
         Priority[i] = RandomNum(10);
@@ -47,8 +59,12 @@ int main(){
         if( CPUBurst[i] % 2 == 0) CPUBurst[i] +=1; 
         for (int j = 0 ; j < CPUBurst[i];j++){
                 while( (Bursts[i][j] = RandomNum(10)) ==  0  );
+                if(  (j+1) % 2 == 0) TotalBurstTime[i] += Bursts[i][j];
         }
     }
+
+    //for(int i = 0; i < proccess;i++) printf("P%d   %d \n",i+1,TotalBurstTime[i]);
+
 
    PrintProccess (proccess,Priority,Arrival_Time,CPUBurst, Bursts );
 
@@ -81,14 +97,17 @@ int main(){
 
     //Proccess ID
     int pos = 0; // proccess position
-    int readyPos = 0; // ready queue position
+    //int readyPos = 0; // ready queue position
 
     // counter for completed proccess
     int proccessCompleted = 0;
+    // To count the seconds
+    int seconds = 0; 
 
     while(proccessCompleted < proccess  ){
-        time_spent = (double)(clock() - begin) / PER_SECOND;
 
+        time_spent = (double)(clock() - begin) / PER_SECOND;
+        seconds = time_spent;
         //LTS -------------
         //Add proccess to ready list
         if(pos <  proccess && time_spent  >=  Arrival_Time[pos]  ) {
@@ -106,7 +125,8 @@ int main(){
                 }
                 pos++;
         }
-        
+
+        printf("Time = %d \n",seconds);
 
         node *n = firstReady ->node;
         while(n != NULL){
@@ -115,11 +135,16 @@ int main(){
             n = n -> node;
         }
 
-       //LTS ends ------------
+        if(firstReady ->node == NULL ) printf("Read list is empty\n");
 
-        //STS ------
-        //---------------------------------------
+
+
+       //LTS ends -----------------------------------------------------------------------
+
+        //STS --------------------------------------------------------------------
+        
         printf ("-------------------------------------------------------------------------------\n");
+        
         if (firstReady ->node != NULL && runningNode ->node == NULL ){
             running = smallestNode(firstReady,head);
             int pid = running. pid;
@@ -139,10 +164,13 @@ int main(){
         
         if( runningNode ->node != NULL  ){
             int pid = runningNode ->node ->pid;
-            printf(" Running Process is P%d  \n", pid+1);
+            printf("Running Process is P%d  \n", pid+1);
         }
-        //---------------------------------------
-        //STS end
+        else{
+            printf("CPU is ideal\n");
+        }
+        
+        //STS end -------------------------------------------------------------------
 
         //MTS 
         //---------------------------------------------
@@ -200,6 +228,10 @@ int main(){
                 n = n -> node;
             }
         }
+        else{
+            printf("Blocked list is empty\n");
+
+        }
 
         if(firstBlocked ->node != NULL){
             node *n = firstBlocked ->node;
@@ -208,6 +240,9 @@ int main(){
                 int pid = n -> pid;
                 
                 if(n ->blockedTime >= n->burst && n ->burstPos >= (  CPUBurst[pid] -1  ) ){
+
+                    TurnAroundTime[pid] =  seconds  - Arrival_Time[pid];
+
                     printf( "proccess execution  has been completed  = P%d  %d\n",pid+1,n ->blockedTime);
                     //Deleting node from blocked linked list
                     deleteNode(firstBlocked,pid,headBlocked);
@@ -258,7 +293,7 @@ int main(){
                     
                     //Deleting node from blocked linked list
                     deleteNode(firstBlocked,pid,headBlocked);
-                    ///------------------
+                    
 
 
                     
@@ -284,6 +319,15 @@ int main(){
         Second ;
 
     }
+
+
+
+    PrintProcessStat(proccess,TurnAroundTime,TotalBurstTime );
+
+
+
+
+
     return 0 ;
 }
 
@@ -297,4 +341,20 @@ void PrintProccess ( int proccess,int Priority[],int Arrival_Time[],int CPUBurst
         }
         printf("\n");
     }
+}
+
+void PrintProcessStat(int proccess,int TurnAroundTime[],int TotalBurstTime[] ){
+    int WaitTime ;
+
+    printf("PID\tTotal Burst Time\tTurn Around Time\tWaiting Time\n");
+    for(int i = 0; i < proccess;i++){
+        WaitTime = TurnAroundTime[i] -  TotalBurstTime[i];  
+        printf("P%d\t\t%d\t\t%d\t\t%d\n", i+1, TotalBurstTime[i],TurnAroundTime[i], WaitTime  );
+    }
+
+
+
+
+
+
 }
