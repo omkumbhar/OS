@@ -29,7 +29,7 @@ int RandomNum(int mod){
 int main(){
     srand(time(0));
 
-    int proccess = 1;
+    int proccess;
     while( (proccess = RandomNum(15)) < 5  );
     int Priority[proccess];
     int Arrival_Time[proccess];
